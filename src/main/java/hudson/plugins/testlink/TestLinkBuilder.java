@@ -111,13 +111,13 @@ public class TestLinkBuilder extends AbstractTestLinkBuilder {
             List<BuildStep> iterativeBuildSteps,
             List<BuildStep> afterIteratingAllTestCasesBuildSteps,
             Boolean transactional, Boolean failedTestsMarkBuildAsFailure,
-            Boolean failIfNoResults, Boolean failOnNotRun, List<ResultSeeker> resultSeekers) {
+            Boolean failIfNoResults, Boolean failOnNotRun, Boolean changeJobResult, List<ResultSeeker> resultSeekers) {
         super(testLinkName, testProjectName, testPlanName, buildName, null, 
                 customFields, executionStatusNotRun, executionStatusPassed,
                 executionStatusFailed, executionStatusBlocked, singleBuildSteps,
                 beforeIteratingAllTestCasesBuildSteps, iterativeBuildSteps,
                 afterIteratingAllTestCasesBuildSteps, transactional,
-                failedTestsMarkBuildAsFailure, failIfNoResults, failOnNotRun, resultSeekers);
+                failedTestsMarkBuildAsFailure, failIfNoResults, failOnNotRun, changeJobResult, resultSeekers);
     }
 
     /**
@@ -133,11 +133,11 @@ public class TestLinkBuilder extends AbstractTestLinkBuilder {
             List<BuildStep> iterativeBuildSteps,
             List<BuildStep> afterIteratingAllTestCasesBuildSteps,
             Boolean transactional, Boolean failedTestsMarkBuildAsFailure,
-            Boolean failIfNoResults, Boolean failOnNotRun, List<ResultSeeker> resultSeekers) {
+            Boolean failIfNoResults, Boolean failOnNotRun, Boolean changeJobResult, List<ResultSeeker> resultSeekers) {
         super(testLinkName, testProjectName, testPlanName, platformName, buildName,
                 customFields, singleBuildSteps, beforeIteratingAllTestCasesBuildSteps, iterativeBuildSteps,
                 afterIteratingAllTestCasesBuildSteps, transactional, failedTestsMarkBuildAsFailure, 
-                failIfNoResults, failOnNotRun, resultSeekers);
+                failIfNoResults, failOnNotRun, changeJobResult, resultSeekers);
     }
 
 	@DataBoundConstructor
@@ -150,11 +150,11 @@ public class TestLinkBuilder extends AbstractTestLinkBuilder {
 			List<BuildStep> iterativeBuildSteps,
 			List<BuildStep> afterIteratingAllTestCasesBuildSteps,
 			Boolean transactional, Boolean failedTestsMarkBuildAsFailure,
-			Boolean failIfNoResults, Boolean failOnNotRun, List<ResultSeeker> resultSeekers) {
+			Boolean failIfNoResults, Boolean failOnNotRun, Boolean changeJobResult, List<ResultSeeker> resultSeekers) {
 		super(testLinkName, testProjectName, testPlanName, platformName, buildName,
 				customFields, testPlanCustomFields, singleBuildSteps, beforeIteratingAllTestCasesBuildSteps, iterativeBuildSteps,
 				afterIteratingAllTestCasesBuildSteps, transactional, failedTestsMarkBuildAsFailure, 
-				failIfNoResults, failOnNotRun, resultSeekers);
+				failIfNoResults, failOnNotRun, changeJobResult, resultSeekers);
 	}
 
 	/**
@@ -278,22 +278,25 @@ public class TestLinkBuilder extends AbstractTestLinkBuilder {
 		final TestLinkResult result = new TestLinkResult(report, build);
 		final TestLinkBuildAction buildAction = new TestLinkBuildAction(build, result);
 		build.addAction(buildAction);
-		
-		if(report.getTestsTotal() <= 0 && this.getFailIfNoResults() == Boolean.TRUE) {
-			listener.getLogger().println("No test results found. Setting the build result as FAILURE.");
-			build.setResult(Result.FAILURE);
-		} else if (report.getFailed() > 0) {
-			if (this.failedTestsMarkBuildAsFailure != null && this.failedTestsMarkBuildAsFailure) {
-			    listener.getLogger().println("There are failed tests, setting the build result as FAILURE.");
-				build.setResult(Result.FAILURE);
-			} else {
-			    listener.getLogger().println("There are failed tests, setting the build result as UNSTABLE.");
-				build.setResult(Result.UNSTABLE);
-			}
-		} else if (this.getFailOnNotRun() != null && this.getFailOnNotRun() && report.getNotRun() > 0) {
-		    listener.getLogger().println("There are not run tests, setting the build result as FAILURE.");
-		    build.setResult(Result.FAILURE);
-		}
+	  if(this.getChangeJobResult() != null && this.getChangeJobResult()) {
+      if(report.getTestsTotal() <= 0 && this.getFailIfNoResults() == Boolean.TRUE) {
+        listener.getLogger().println("No test results found. Setting the build result as FAILURE.");
+        build.setResult(Result.FAILURE);
+      } else if (report.getFailed() > 0) {
+        if (this.failedTestsMarkBuildAsFailure != null && this.failedTestsMarkBuildAsFailure) {
+            listener.getLogger().println("There are failed tests, setting the build result as FAILURE.");
+          build.setResult(Result.FAILURE);
+        } else {
+            listener.getLogger().println("There are failed tests, setting the build result as UNSTABLE.");
+          build.setResult(Result.UNSTABLE);
+        }
+      } else if (this.getFailOnNotRun() != null && this.getFailOnNotRun() && report.getNotRun() > 0) {
+          listener.getLogger().println("There are not run tests, setting the build result as FAILURE.");
+          build.setResult(Result.FAILURE);
+      }
+    } else {
+        listener.getLogger().println("hanging jenkins build result is disabled");
+    }
 
 		LOGGER.log(Level.INFO, "TestLink builder finished");
 		

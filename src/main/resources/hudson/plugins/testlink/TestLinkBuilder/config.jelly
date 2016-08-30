@@ -84,6 +84,9 @@
           <f:checkbox name="TestLinkBuilder.failOnNotRun" value="${instance.failOnNotRun}" checked="${instance.failOnNotRun}" />
       </f:entry> 
    
+      <f:entry title="${%Change job result}"  help="${rootURL}/../plugin/testlink/help-changeJobResult.html">
+          <f:checkbox name="TestLinkBuilder.changeJobResult" value="${instance.changeJobResult}" checked="true" />
+      </f:entry> 
     </f:advanced>
 
     <f:block><p><strong>Result Seeking Strategy</strong></p></f:block>

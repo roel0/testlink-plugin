@@ -112,6 +112,12 @@ public class AbstractTestLinkBuilder extends Builder {
      */
     protected final Boolean failOnNotRun;
 
+    /**
+     * Touch the jenkins job result or not
+     */
+    protected final Boolean changeJobResult;
+
+
     /* --- Other members --- */
 
     /**
@@ -136,7 +142,7 @@ public class AbstractTestLinkBuilder extends Builder {
             String platformName, String buildName, String customFields, String testPlanCustomFields, List<BuildStep> singleBuildSteps,
             List<BuildStep> beforeIteratingAllTestCasesBuildSteps, List<BuildStep> iterativeBuildSteps,
             List<BuildStep> afterIteratingAllTestCasesBuildSteps, Boolean transactional,
-            Boolean failedTestsMarkBuildAsFailure, Boolean failIfNoResults, Boolean failOnNotRun,
+            Boolean failedTestsMarkBuildAsFailure, Boolean failIfNoResults, Boolean failOnNotRun, Boolean changeJobResult,
             List<ResultSeeker> resultSeekers) {
         super();
         this.testLinkName = testLinkName;
@@ -154,6 +160,7 @@ public class AbstractTestLinkBuilder extends Builder {
         this.failedTestsMarkBuildAsFailure = failedTestsMarkBuildAsFailure;
         this.failIfNoResults = failIfNoResults;
         this.failOnNotRun = failOnNotRun;
+        this.changeJobResult = changeJobResult
         this.resultSeekers = resultSeekers;
     }
 
@@ -165,12 +172,12 @@ public class AbstractTestLinkBuilder extends Builder {
             String platformName, String buildName, String customFields, List<BuildStep> singleBuildSteps,
             List<BuildStep> beforeIteratingAllTestCasesBuildSteps, List<BuildStep> iterativeBuildSteps,
             List<BuildStep> afterIteratingAllTestCasesBuildSteps, Boolean transactional,
-            Boolean failedTestsMarkBuildAsFailure, Boolean failIfNoResults, Boolean failOnNotRun,
+            Boolean failedTestsMarkBuildAsFailure, Boolean failIfNoResults, Boolean failOnNotRun, Boolean changeJobResult,
             List<ResultSeeker> resultSeekers) {
         this(testLinkName, testProjectName, testPlanName, platformName, buildName, customFields,
                 /*testPlanCustomFields*/ null, singleBuildSteps, beforeIteratingAllTestCasesBuildSteps,
                 iterativeBuildSteps, afterIteratingAllTestCasesBuildSteps, transactional, failedTestsMarkBuildAsFailure,
-                failIfNoResults, failOnNotRun, resultSeekers);
+                failIfNoResults, failOnNotRun, changeJobResult, resultSeekers);
     }
 
     /**
@@ -190,6 +197,7 @@ public class AbstractTestLinkBuilder extends Builder {
      * @param transactional Whether the build's execution is transactional or not.
      * @param failedTestsMarkBuildAsFailure Whether failed tests mark the build as failure or not.
      * @param failIfNoResults If true marks the build as FAILURE.
+     * @param changejobresult If true, testlink result wil propagnate as jenkins result
      * @param resultSeekers List of result seekers.
      * @deprecated
      */
@@ -199,11 +207,11 @@ public class AbstractTestLinkBuilder extends Builder {
             List<BuildStep> singleBuildSteps, List<BuildStep> beforeIteratingAllTestCasesBuildSteps,
             List<BuildStep> iterativeBuildSteps, List<BuildStep> afterIteratingAllTestCasesBuildSteps,
             Boolean transactional, Boolean failedTestsMarkBuildAsFailure, Boolean failIfNoResults,
-            Boolean failOnNotRun, List<ResultSeeker> resultSeekers) {
+            Boolean failOnNotRun, Boolean changeJobResult, List<ResultSeeker> resultSeekers) {
         this(testLinkName, testProjectName, testPlanName, platformName, buildName, customFields,
              /*testPlanCustomFields*/ null, singleBuildSteps, beforeIteratingAllTestCasesBuildSteps,
              iterativeBuildSteps, afterIteratingAllTestCasesBuildSteps, transactional, failedTestsMarkBuildAsFailure,
-             failIfNoResults, failOnNotRun, resultSeekers);
+             failIfNoResults, failOnNotRun, changeJobResult, resultSeekers);
     }
 
     public String getTestLinkName() {
@@ -307,6 +315,13 @@ public class AbstractTestLinkBuilder extends Builder {
      */
     public Boolean getFailOnNotRun() {
         return failOnNotRun;
+    }
+    
+    /**
+     * @return the changejobresult
+     */
+    public Boolean getChangeJobResult() {
+        return changeJobResult;
     }
 
     /**
